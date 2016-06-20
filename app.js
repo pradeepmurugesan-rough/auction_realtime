@@ -8,11 +8,19 @@ app.get('/', function(req, res){
 
 io.on('connection', function(socket){
     console.log('user connected');
-    socket.on('bidUpdated', function(user){
+    socket.on('bidUpdated', function(bid){
         console.log("======== received the message");
-        console.log(user);
-        io.emit('bidUpdated', user);
+        console.log(bid);
+        bidObj = JSON.parse(bid);
+        console.log("broadcasting to the channel " + bidObj.auctionId);
+        io.sockets.in(bidObj.auctionId).emit('bidUpdated', bid);
     });
+
+    socket.on('register', function(channel){
+        console.log("user joining in channel " + channel);
+        socket.join(channel);
+    });
+
 });
 
 http.listen(process.env.PORT, function(){
